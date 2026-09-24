@@ -1,11 +1,11 @@
 import './style.css'
-import heroImg from './assets/hero.png'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import { setupCounter } from './counter.js'
+import './functions.js'
 
 document.querySelector('#app').innerHTML = `
-<p>Hola<p>
+<div>
+<h1>BatoiBooks</h1>
+<p>Abre la consola para ver el resultado</p>
+</div>
 `
 
 setupCounter(document.querySelector('#counter'))
