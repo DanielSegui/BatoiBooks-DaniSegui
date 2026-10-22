@@ -1,44 +1,46 @@
+import { getDBBooks, addDBBook, removeDBBook, changeDBBook } from '../services/api.js'
 import Book from './book.class.js'
 const APUNTS = "Apunts"
 
 export default class Books {
     constructor(){
-        this.data = []
+            this.data = []
     }
 
-    populate(books){
-        this.data = books.map(book => new Book(book)) 
+    async fetchAll(){
+        const libros = await getDBBooks()
+        this.data = libros.map(book => new Book(book)) 
     }
 
-    addBook(bookData){
-        const nuevoId = Math.max(...this.data.map(book => book.id)) + 1
-        const nuevoLibro = new Book({
-            ...bookData,
-            id: nuevoId
-        })
+    async addBook(bookData){
+        const libro = await addDBBook(bookData)
+        const nuevoLibro = new Book(libro)
 
         this.data.push(nuevoLibro)
         return nuevoLibro
     }
 
-    removeBook(bookId){
+    async removeBook(bookId){
         const index = this.data.findIndex(book => book.id === bookId)
 
         if (index === -1){
             throw new Error()
         } 
-
+        
+        await removeDBBook(bookId)
         this.data.splice(index, 1)
     }
 
-    changeBook(newData){
+    async changeBook(newData){
         const index = this.data.findIndex(book => book.id === newData.id)
 
         if(index === -1){
             throw new Error()
         }
+        
+        const libroEditado = await changeDBBook(newData)
 
-        const newBook = new Book(newData)
+        const newBook = new Book(libroEditado)
 
         this.data[index] = newBook
         return newBook
@@ -99,15 +101,6 @@ export default class Books {
 
     booksNotSold(){
         return this.data.filter(book => book.soldDate === "")
-    }
-
-    incrementPriceOfBooks(porcentaje){
-
-        return this.data.map(book => ({
-            ...book,
-            price: book.price + (book.price * porcentaje)
-        }))
-
     }
 
 }

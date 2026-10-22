@@ -1,5 +1,4 @@
 import './style.css'
-import data from '../src/services/datos.js'
 import Books from './model/books.class.js'
 import Users from './model/users.class.js'
 import Modules from './model/modules.class.js'
@@ -15,15 +14,28 @@ const books = new Books()
 const users = new Users()
 const modules = new Modules()
 
-books.populate(data.books)
-users.populate(data.users)
-modules.populate(data.modules)
+try {
+await books.fetchAll()
+await users.fetchAll()
+await modules.fetchAll()
 
-console.log("Libros del módulo 5021:")
-console.log(books.booksFromModule("5021"))
+console.log('Hay ', books.data.length, ' libros')
+console.log('Hay ', users.data.length, ' usuarios')
+console.log('Hay ', modules.data.length, ' modulos')
 
-console.log("Libros en buen estado:")
-console.log(books.booksWithStatus("good"))
+const usuario = await users.addUser({
+    nick: 'prueba',
+    email: 'prueba@example.com',
+    password: '1234'
+})
 
-console.log("Libros incrementando su precio un 10%")
-console.log(books.incrementPriceOfBooks(0.10))
+console.log(usuario)
+console.log('La cantidad de usuarios después de haber añadido uno nuevo es de:', users.data.length)
+
+await users.removeUser(usuario.id)
+
+console.log('Usuarios en memoria:', users.data.length)
+
+} catch(error){
+    console.error('Ha ocurrido un error:', error)
+}

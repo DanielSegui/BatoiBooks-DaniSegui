@@ -1,3 +1,4 @@
+import { getDBModules } from '../services/api.js'
 import Module from './module.class.js'
 
 export default class Modules {
@@ -5,8 +6,9 @@ export default class Modules {
         this.data = []
     }
 
-    populate(modules){
-        this.data = modules.map(module => new Module(
+    async fetchAll(){
+        const modulos = await getDBModules()
+        this.data = modulos.map(module => new Module(
             module.code,
             module.cliteral,
             module.vliteral,
