@@ -1,4 +1,5 @@
-// test/books.class.test.js
+
+ // test/books.class.test.js
 //
 // Esto es lo que se te entrega como ÚNICO EJEMPLO. El resto de tests los
 // escribes tú, siguiendo este mismo patrón.
@@ -18,6 +19,17 @@ import Books from '../src/model/books.class'
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
+
+const API_URL = 'http://localhost:3000'
+
+const nuevoLibro = {
+  userId: 2,
+  moduleCode: 'ABCD',
+  publisher: 'Apunts',
+  price: 12,
+  pages: 40,
+  status: 'good'
+}
 
 describe('Books — persistencia', () => {
   it('addBook crea un libro en el servidor y lo añade a this.data', async () => {
@@ -63,4 +75,176 @@ describe('Books — persistencia', () => {
   //   )
   //   // ¿qué esperas que haga tu método aquí?
   // })
+
+  it('fetchAll carga los libros del servidor', async () => {
+    const books = new Books()
+
+    await books.fetchAll()
+
+    expect(books.data.length).toBeGreaterThan(0)
+    expect(books.data[0].id).toBeDefined()
+  })
+
+  it('fetchAll rechaza con error 500 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+
+    server.use(
+      http.get(`${API_URL}/books`, () =>
+        new HttpResponse(null, { status: 500 })
+      )
+    )
+
+    await expect(books.fetchAll()).rejects.toBeDefined()
+    expect(books.data).toEqual(originalData)
+  })
+
+  it('fetchAll rechaza con error 404 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+
+    server.use(
+      http.get(`${API_URL}/books`, () =>
+        new HttpResponse(null, { status: 404 })
+      )
+    )
+
+    await expect(books.fetchAll()).rejects.toBeDefined()
+    expect(books.data).toEqual(originalData)
+  })
+
+  it('addBook rechaza con error 500 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+
+    server.use(
+      http.post(`${API_URL}/books`, () =>
+        new HttpResponse(null, { status: 500 })
+      )
+    )
+
+    await expect(books.addBook(nuevoLibro)).rejects.toBeDefined()
+    expect(books.data).toEqual(originalData)
+  })
+
+  it('addBook rechaza con error 404 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+
+    server.use(
+      http.post(`${API_URL}/books`, () =>
+        new HttpResponse(null, { status: 404 })
+      )
+    )
+
+    await expect(books.addBook(nuevoLibro)).rejects.toBeDefined()
+    expect(books.data).toEqual(originalData)
+  })
+
+  it('removeBook elimina un libro existente', async () => {
+    const books = new Books()
+    await books.fetchAll()
+
+    const libro = books.data[0]
+    const cantidadInicial = books.data.length
+
+    await books.removeBook(libro.id)
+
+    expect(books.data).toHaveLength(cantidadInicial - 1)
+    expect(books.data.find(book => book.id === libro.id)).toBeUndefined()
+  })
+
+  it('removeBook rechaza con error 500 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+    const id = books.data[0].id
+
+    server.use(
+      http.delete(`${API_URL}/books/${id}`, () =>
+        new HttpResponse(null, { status: 500 })
+      )
+    )
+
+    await expect(books.removeBook(id)).rejects.toBeDefined()
+    expect(books.data).toEqual(originalData)
+  })
+
+  it('removeBook rechaza con error 404 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+    const id = books.data[0].id
+
+    server.use(
+      http.delete(`${API_URL}/books/${id}`, () =>
+        new HttpResponse(null, { status: 404 })
+      )
+    )
+
+    await expect(books.removeBook(id)).rejects.toBeDefined()
+    expect(books.data).toEqual(originalData)
+  })
+
+  it('changeBook modifica un libro existente', async () => {
+    const books = new Books()
+    await books.fetchAll()
+
+    const libro = books.data[0]
+    const libroModificado = {
+      ...libro,
+      publisher: 'Editorial modificada',
+      price: 20
+    }
+
+    const resultado = await books.changeBook(libroModificado)
+
+    expect(resultado.publisher).toBe('Editorial modificada')
+    expect(resultado.price).toBe(20)
+    expect(books.data.find(book => book.id === libro.id)).toEqual(resultado)
+  })
+
+  it('changeBook rechaza con error 500 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+    const libro = books.data[0]
+
+    server.use(
+      http.put(`${API_URL}/books/${libro.id}`, () =>
+        new HttpResponse(null, { status: 500 })
+      )
+    )
+
+    await expect(books.changeBook({
+      ...libro,
+      price: 99
+    })).rejects.toBeDefined()
+
+    expect(books.data).toEqual(originalData)
+  })
+
+  it('changeBook rechaza con error 404 y mantiene data sin cambios', async () => {
+    const books = new Books()
+    await books.fetchAll()
+    const originalData = [...books.data]
+    const libro = books.data[0]
+
+    server.use(
+      http.put(`${API_URL}/books/${libro.id}`, () =>
+        new HttpResponse(null, { status: 404 })
+      )
+    )
+
+    await expect(books.changeBook({
+      ...libro,
+      price: 99
+    })).rejects.toBeDefined()
+
+    expect(books.data).toEqual(originalData)
+  })
 })

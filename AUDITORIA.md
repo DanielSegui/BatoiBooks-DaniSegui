@@ -1,89 +1,43 @@
-# Auditoría BatoiBooks Dani
+# Auditoría A: Datos en memoria o consultas al servidor
 
-## Implementación original remove
+## 1. Trabajar con los datos en memoria (`this.data`)
 
-```javascript
+Una opción es cargar los datos del servidor y guardarlos en `this.data`. Así podemos trabajar con ellos sin tener que hacer una petición al servidor cada vez que queremos consultar algo.
 
-removeBook(bookId) {
-  this.data = this.data.filter(b => b.id !== bookId)
-}
+**Ventajas:**
+- Las consultas son más rápidas.
+- No tenemos que hacer tantas peticiones al servidor.
+- Podemos utilizar los datos que ya tenemos cargados para hacer búsquedas y filtros.
 
-```
+**Desventajas:**
+- Si los datos cambian en el servidor, los que tenemos guardados pueden quedarse desactualizados.
+- Primero tenemos que cargar los datos con `fetchAll()`.
 
-Esta función como nos la ha dado el enunciado cumple su función de eliminar el libros del this.data creando un nuevo array excluyendo los libros que el ID coincide con bookId pero no comprueba si el libro con esa ID existe, si no existe se crea un array exactamente igual que el anterior y no da error.
+## 2. Consultar los datos al servidor cada vez
 
-## Implementación corregida remove
+Otra opción es hacer una petición al servidor cada vez que necesitamos consultar algún dato.
 
-```javascript
-removeBook(bookId){
-        const index = this.data.findIndex(book => book.id === bookId)
+**Ventajas:**
+- Podemos obtener los datos actualizados del servidor.
+- No dependemos de tener una copia de los datos guardada en memoria.
 
-        if (index === -1){
-            throw new Error()
-        }
+**Desventajas:**
+- Las consultas pueden tardar más porque tenemos que hacer peticiones al servidor.
+- Hacemos más peticiones.
+- Si el servidor falla, podemos tener problemas para obtener los datos.
 
-        this.data.splice(index, 1)
-}
-```
+## 3. Qué he elegido en mi práctica
 
-Ahora lo que hace la función es primero buscar el libro y comprobar que existe si no existe lanza un error y si existe el splice() lo elimina del this.data
+En mi práctica he elegido trabajar con los datos guardados en `this.data`.
 
-## Implementación original add
+Para hacerlo, he creado el método `fetchAll()` en cada una de las tres clases: `Books`, `Users` y `Modules`. Cada método obtiene los datos que le corresponden del servidor y los guarda en su propia colección.
 
-```javascript
-addBook(bookData) {
-  const newBook = new Book({ ...bookData, id: this.data.length + 1 })
-  this.data.push(newBook)
-  return newBook
-}
-```
+En mi `main.js` llamo a los tres métodos para cargar los libros, los usuarios y los módulos al principio. Después, los demás métodos trabajan con los datos que ya están guardados en memoria.
 
-En esta función se utiliza el this.data.length + 1 para generar la id del libro nuevo, el problema es que el número de elementos que hay en el array no tiene porque coincidir con el ID más alto, quiero decir que si tenemos libros con IDs 1, 2 y 5 por ejemplo hay 3 libros pero el de ID más alto es el 5 al hacer this.data.length + 1, como hay 3 elementos más el + 1 la nuevs iD sería 4 cuando lo que queremos es que sea el 6 porque es el último que hemos añadido. Después el push si que está bien hecho.
+- **Books:** utilizo métodos como `booksFromUser()` y `booksFromModule()` para buscar libros según el usuario o el módulo.
+- **Users:** utilizo métodos como `getUserById()` y `getUserByNickName()` para buscar usuarios.
+- **Modules:** utilizo `getModuleByCode()` para buscar un módulo por su código.
 
-## Implementación corregida add
+Además, cuando añado, elimino o modifico un libro o un usuario, actualizo también `this.data` si la petición al servidor funciona correctamente.
 
-```javascript
-addBook(bookData){
-    const nuevoId = Math.max(...this.data.map(book => book.id)) + 1
-
-    const nuevoLibro = new Book({
-        ...bookData,
-        id: nuevoId
-    })
-
-    this.data.push(nuevoLibro)
-    return nuevoLibro
-}
-```
-
-Aquí de esta manera buscamos el ID más alto que haya en el this.data y le sumamos 1 para que el nuevo libro tenga un ID mayor que todos los demás.
-
-## Implementación original change
-
-```javascript
-changeBook(newData) {
-  const index = this.data.findIndex(b => b.id === newData.id)
-  this.data[index] = newData // newData es un objeto plano, no una instancia de Book
-  return newData
-}
-```
-
-El primer problema que se ve esque no se comprueba si se ha encontrado el libro. Si el libro no existe devuelve un -1 y no lanza ningun error y el segundo es que mete directamente newData dentro de this.data, newData es un objeto normal pero nosotros lo que queremos dentro del this.data es tener instancias de la clase Book por lo que hay que crear un nuevo Book con los datos del newData.
-
-## Implementación corregida change
-
-```javascript
-changeBook(newData){
-        const index = this.data.findIndex(book => book.id === newData.id)
-
-        if(index === -1){
-            throw new Error()
-        }
-
-        const newBook = new Book(newData)
-
-        this.data[index] = newBook
-        return newBook
-}
-```
-Ahora lo que se ve es que se comprueba si existe la ID y si no existe se lanza un error, si existe se crea una nueva instancia Book con los datos del newData, this.data[index] = newBook con este codigo se sustituye el libro antiguo por el nuevo y luego con el return se devuelve el libro con los nuevos datos.
+He elegido esta opción porque me parece más sencilla y así no tengo que hacer una petición al servidor cada vez que quiero consultar algún dato. La desventaja es que, si alguien cambia los datos directamente en el servidor, los que tengo guardados pueden quedarse desactualizados. Para solucionarlo, puedo volver a llamar a `fetchAll()` y cargar los datos otra vez.

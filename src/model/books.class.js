@@ -12,12 +12,12 @@ export default class Books {
         this.data = libros.map(book => new Book(book)) 
     }
 
-    async addBook(bookData){
-        const libro = await addDBBook(bookData)
-        const nuevoLibro = new Book(libro)
+    async addBook(bookData) {
+    const libro = await addDBBook(bookData)
 
-        this.data.push(nuevoLibro)
-        return nuevoLibro
+    this.data.push(libro)
+    return libro
+    
     }
 
     async removeBook(bookId){
