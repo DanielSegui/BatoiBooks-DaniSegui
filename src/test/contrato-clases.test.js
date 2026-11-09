@@ -32,16 +32,17 @@ const CONTRATO = {
   user: ['toString'],
   module: ['toString'],
   books: [
-    'fetchAll', 'addBook', 'removeBook', 'changeBook', 'toString',
+    'populate', 'addBook', 'removeBook', 'changeBook', 'toString',
     'getBookById', 'getBookIndexById', 'bookExists', 'booksFromUser',
     'booksFromModule', 'booksCheeperThan', 'booksWithStatus',
     'averagePriceOfBooks', 'booksOfTypeNotes', 'booksNotSold',
+    'incrementPriceOfBooks'
   ],
   users: [
-    'fetchAll', 'addUser', 'removeUser', 'changeUser', 'toString',
+    'populate', 'addUser', 'removeUser', 'changeUser', 'toString',
     'getUserById', 'getUserIndexById', 'getUserByNickName'
   ],
-  modules: ['fetchAll', 'toString', 'getModuleByCode']
+  modules: ['populate', 'toString', 'getModuleByCode']
 }
 
 describe('Contrato: ficheros y clases', () => {

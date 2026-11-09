@@ -1923,16 +1923,28 @@
       "id": 9
     },
     {
-      "userId": 5,
-      "moduleCode": "5021",
-      "publisher": "Apunts",
-      "price": 5,
-      "pages": 57,
-      "status": "good",
+      "publisher": "marjal",
+      "price": 124.5,
+      "moduleCode": "0045",
+      "pages": 145,
+      "status": "new",
       "photo": "",
       "comments": "",
+      "userId": 2,
       "soldDate": "",
-      "id": 10
+      "id": 11
+    },
+    {
+      "publisher": "edebe",
+      "price": 16,
+      "moduleCode": "0028",
+      "pages": 40,
+      "status": "used",
+      "photo": "",
+      "comments": "",
+      "userId": 2,
+      "soldDate": "",
+      "id": 12
     }
   ]
 }
