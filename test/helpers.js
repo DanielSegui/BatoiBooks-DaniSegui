@@ -4,7 +4,6 @@ import { vi } from 'vitest'
 
 // Ruta al main.js desde esta carpeta
 const MAIN = '../src/main.js'
-
 export const STATUSES = ['new', 'good', 'used', 'bad', 'digital']
 
 export const MODULES = [

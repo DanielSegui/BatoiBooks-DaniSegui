@@ -1936,15 +1936,27 @@
     },
     {
       "publisher": "edebe",
-      "price": 16,
-      "moduleCode": "0028",
-      "pages": 40,
-      "status": "used",
+      "price": 78,
+      "moduleCode": "0047",
+      "pages": 200,
+      "status": "good",
       "photo": "",
       "comments": "",
       "userId": 2,
       "soldDate": "",
       "id": 12
+    },
+    {
+      "publisher": "edebe",
+      "price": 34,
+      "moduleCode": "0222",
+      "pages": 120,
+      "status": "new",
+      "photo": "",
+      "comments": "",
+      "userId": 2,
+      "soldDate": "",
+      "id": 13
     }
   ]
 }

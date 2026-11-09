@@ -1,43 +1,63 @@
-# Auditoría A: Datos en memoria o consultas al servidor
+# Auditoría del método renderBook
 
-## 1. Trabajar con los datos en memoria (`this.data`)
+Después de revisar el código que nos ha proporcionado la IA, he encontrado tres problemas que pueden afectar al funcionamiento de la aplicación.
 
-Una opción es cargar los datos del servidor y guardarlos en `this.data`. Así podemos trabajar con ellos sin tener que hacer una petición al servidor cada vez que queremos consultar algo.
+## 1. La fecha de venta aparece al revés
 
-**Ventajas:**
-- Las consultas son más rápidas.
-- No tenemos que hacer tantas peticiones al servidor.
-- Podemos utilizar los datos que ya tenemos cargados para hacer búsquedas y filtros.
+**Qué falla:**
 
-**Desventajas:**
-- Si los datos cambian en el servidor, los que tenemos guardados pueden quedarse desactualizados.
-- Primero tenemos que cargar los datos con `fetchAll()`.
+La condición que comprueba si el libro tiene una fecha de venta está al revés. Cuando el libro tiene una fecha, muestra "En venta", y cuando no tiene ninguna, muestra "Vendido el".
 
-## 2. Consultar los datos al servidor cada vez
+**Cómo reproducirlo:**
 
-Otra opción es hacer una petición al servidor cada vez que necesitamos consultar algún dato.
+Podemos probarlo con dos libros: uno que tenga `soldDate: "2023-02-01"` y otro que tenga `soldDate: ""`.
 
-**Ventajas:**
-- Podemos obtener los datos actualizados del servidor.
-- No dependemos de tener una copia de los datos guardada en memoria.
+**Consecuencias:**
 
-**Desventajas:**
-- Las consultas pueden tardar más porque tenemos que hacer peticiones al servidor.
-- Hacemos más peticiones.
-- Si el servidor falla, podemos tener problemas para obtener los datos.
+La información que ve el usuario es incorrecta, porque puede pensar que un libro está disponible cuando realmente ya se ha vendido, o al contrario.
 
-## 3. Qué he elegido en mi práctica
+**Cómo lo he corregido:**
 
-En mi práctica he elegido trabajar con los datos guardados en `this.data`.
+He cambiado la condición para que, si el libro tiene una fecha, aparezca como vendido. Además, muestro la fecha en formato día/mes/año. Si no tiene fecha, aparece "En venta".
 
-Para hacerlo, he creado el método `fetchAll()` en cada una de las tres clases: `Books`, `Users` y `Modules`. Cada método obtiene los datos que le corresponden del servidor y los guarda en su propia colección.
+## 2. Puede fallar si el módulo del libro no existe
 
-En mi `main.js` llamo a los tres métodos para cargar los libros, los usuarios y los módulos al principio. Después, los demás métodos trabajan con los datos que ya están guardados en memoria.
+**Qué falla:**
 
-- **Books:** utilizo métodos como `booksFromUser()` y `booksFromModule()` para buscar libros según el usuario o el módulo.
-- **Users:** utilizo métodos como `getUserById()` y `getUserByNickName()` para buscar usuarios.
-- **Modules:** utilizo `getModuleByCode()` para buscar un módulo por su código.
+El código utiliza directamente `module.cliteral` sin comprobar antes si existe el módulo. Si no lo encuentra, se produce un error.
 
-Además, cuando añado, elimino o modifico un libro o un usuario, actualizo también `this.data` si la petición al servidor funciona correctamente.
+**Cómo reproducirlo:**
 
-He elegido esta opción porque me parece más sencilla y así no tengo que hacer una petición al servidor cada vez que quiero consultar algún dato. La desventaja es que, si alguien cambia los datos directamente en el servidor, los que tengo guardados pueden quedarse desactualizados. Para solucionarlo, puedo volver a llamar a `fetchAll()` y cargar los datos otra vez.
+Podemos cargar un libro cuyo `moduleCode` no coincida con ninguno de los módulos disponibles.
+
+**Consecuencias:**
+
+La aplicación puede dejar de mostrar ese libro y producir un error al intentar acceder a una propiedad de un módulo que no existe.
+
+**Cómo lo he corregido:**
+
+He añadido esta comprobación:
+
+`const nombreModulo = module ? module.cliteral : book.moduleCode`
+
+De esta forma, si encuentra el módulo muestra su nombre y, si no, muestra el código del módulo que tiene guardado el libro.
+
+## 3. Uso de innerHTML con datos del servidor
+
+**Qué falla:**
+
+El código utiliza `innerHTML` para mostrar directamente datos que vienen del servidor, como los comentarios o la editorial. Esto puede ser peligroso porque, si alguno de esos campos contiene código HTML, el navegador lo interpreta.
+
+**Cómo reproducirlo:**
+
+Podemos probarlo poniendo código HTML en el campo de comentarios de un libro. Por ejemplo, una etiqueta que cree una imagen. Al cargar el libro, si se utiliza `innerHTML`, el navegador interpreta ese código en vez de mostrarlo como texto.
+
+**Consecuencias:**
+
+Esto puede ser un problema de seguridad, ya que alguien podría introducir contenido malicioso que se ejecute o modifique la página.
+
+**Cómo lo he corregido:**
+
+He dejado de utilizar `innerHTML` para introducir los datos de los libros. En su lugar, creo los elementos con `document.createElement()` y utilizo `textContent` para mostrar los datos como texto.
+
+He elegido esta solución porque es más segura y evita que el navegador interprete los datos recibidos como código HTML.
