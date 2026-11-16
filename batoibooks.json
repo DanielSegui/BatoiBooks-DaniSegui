@@ -1923,16 +1923,16 @@
       "id": 9
     },
     {
+      "id": 11,
+      "userId": 2,
+      "moduleCode": "0045",
       "publisher": "marjal",
       "price": 124.5,
-      "moduleCode": "0045",
       "pages": 145,
-      "status": "new",
+      "status": "good",
       "photo": "",
       "comments": "",
-      "userId": 2,
-      "soldDate": "",
-      "id": 11
+      "soldDate": ""
     },
     {
       "publisher": "edebe",
@@ -1957,6 +1957,66 @@
       "userId": 2,
       "soldDate": "",
       "id": 13
+    },
+    {
+      "publisher": "edebe",
+      "price": 56,
+      "moduleCode": "0018",
+      "pages": 320,
+      "status": "new",
+      "photo": "",
+      "comments": "",
+      "userId": 2,
+      "soldDate": "",
+      "id": 14
+    },
+    {
+      "id": 15,
+      "userId": 2,
+      "moduleCode": "0012",
+      "publisher": "edebe",
+      "price": 130,
+      "pages": 150,
+      "status": "used",
+      "photo": "",
+      "comments": "",
+      "soldDate": ""
+    },
+    {
+      "id": 16,
+      "publisher": "Apunts",
+      "price": 30,
+      "moduleCode": "0015",
+      "pages": 75,
+      "status": "new",
+      "photo": "",
+      "comments": "",
+      "userId": 2,
+      "soldDate": ""
+    },
+    {
+      "id": 17,
+      "userId": 2,
+      "moduleCode": "0028",
+      "publisher": "edebe",
+      "price": 87,
+      "pages": 300,
+      "status": "new",
+      "photo": "",
+      "comments": "",
+      "soldDate": ""
+    },
+    {
+      "id": 18,
+      "publisher": "Apunts",
+      "price": 23.21,
+      "moduleCode": "0343",
+      "pages": 70,
+      "status": "new",
+      "photo": "",
+      "comments": "",
+      "userId": 2,
+      "soldDate": ""
     }
   ]
 }

@@ -1,19 +1,30 @@
 
-export default class View {
+export default class View {   
     constructor() {
         this.booksList = document.getElementById('list')
         this.moduleSelect = document.getElementById('moduleCode')
         this.formulario = document.getElementById('bookForm')
         this.messages = document.getElementById('messages')
-        this.removeButton = document.getElementById('remove-btn')
-        this.idRemove = document.getElementById('id-remove')
-    }
 
-    renderBook(book, module) {
+        this.formTitle = document.querySelector('#form h2')
+        this.bookIdContainer = document.getElementById('book-id-container')
+        this.bookIdInput = document.getElementById('id')
+
+        this.cartCount = document.getElementById('cart-count')
+
+        this.pages = {
+            list: document.getElementById('list'),
+            form: document.getElementById('form'),
+            about: document.getElementById('about'),
+            notFound: document.getElementById('not-found')
+    }
+}
+
+    renderBook(book, module, userId) {
         const card = document.createElement('div')
         card.className = 'card'
         card.dataset.id = book.id
-
+        card.dataset.userId = book.userId
         const nombreModulo = module ? module.cliteral : book.moduleCode
 
         let venta = 'En venta'
@@ -28,6 +39,46 @@ export default class View {
         image.alt = `Libro: ${book.id}`
 
         const contenido = document.createElement('div')
+
+        const acciones = document.createElement('div')
+        acciones.className = 'acciones'
+
+        if(book.userId === userId){
+            const editButton = document.createElement('button')
+            editButton.type = 'button'
+            editButton.setAttribute('aria-label', 'Editar')
+
+            const editIcon = document.createElement('span')
+            editIcon.className = 'material-icons'
+            editIcon.textContent = 'edit'
+
+            editButton.append(editIcon)
+            acciones.append(editButton)
+
+
+            const deleteButton = document.createElement('button')
+            deleteButton.type = 'button'
+            deleteButton.setAttribute('aria-label', 'Borrar')
+
+            const deleteIcon = document.createElement('span')
+            deleteIcon.className = 'material-icons'
+            deleteIcon.textContent = 'delete'
+
+            deleteButton.append(deleteIcon)
+            acciones.append(deleteButton)
+
+        } else {
+            const cartButton = document.createElement('button')
+            cartButton.type = 'button'
+            cartButton.setAttribute('aria-label', 'Añadir al carrito')
+
+            const cartIcon = document.createElement('span')
+            cartIcon.className = 'material-icons'
+            cartIcon.textContent = 'add_shopping_cart'
+
+            cartButton.append(cartIcon)
+            acciones.append(cartButton)
+        }
 
         const titulo = document.createElement('h3')
         titulo.textContent = `${nombreModulo} (${book.id})`
@@ -60,7 +111,7 @@ export default class View {
             precio
         )
 
-        card.append(image, contenido)
+        card.append(image, contenido, acciones)
 
         this.booksList.append(card)
     }
@@ -74,7 +125,8 @@ export default class View {
         this.moduleSelect.append(option)
     }
 
-    bindEvents(onAddBook, onRemoveBook) {
+    bindEvents(onSaveBook, onEditBook, onRemoveBook, onAddToCart) {
+
         this.formulario.addEventListener('submit', (event) => {
             event.preventDefault()
 
@@ -83,6 +135,7 @@ export default class View {
             }
 
             const bookData = {
+                id: this.formulario.elements.id.value,
                 publisher: this.formulario.elements.publisher.value,
                 price: Number(this.formulario.elements.price.value),
                 moduleCode: this.formulario.elements.moduleCode.value,
@@ -92,11 +145,40 @@ export default class View {
                 comments: this.formulario.elements.comments.value
             }
 
-            onAddBook(bookData)
+            onSaveBook(bookData)
         })
 
-        this.removeButton.addEventListener('click', () => {
-            onRemoveBook(this.idRemove.value)
+        this.formulario.addEventListener('reset', () => {
+            this.setAddMode()
+            window.location.hash = '#form'
+        })
+
+        this.booksList.addEventListener('click', (event) => {
+
+            const button = event.target.closest('button')
+
+            if (!button) {
+                return
+            }
+
+            const card = button.closest('.card')
+
+            if (!card) {
+                return
+            }
+
+            const id = card.dataset.id
+            const action = button.getAttribute('aria-label')
+
+            if (action === 'Borrar') {
+                onRemoveBook(id)
+
+            } else if (action === 'Editar') {
+                onEditBook(id)
+
+            } else if (action === 'Añadir al carrito') {
+                onAddToCart(id)
+            }
         })
     }
 
@@ -143,5 +225,34 @@ export default class View {
                 alert.remove()
             }, 3000)
         }
+    }
+
+    fillForm(book){
+        this.formulario.elements.id.value = book.id
+        this.formulario.elements.publisher.value = book.publisher
+        this.formulario.elements.price.value = book.price
+        this.formulario.elements.moduleCode.value = book.moduleCode
+        this.formulario.elements.pages.value = book.pages
+        this.formulario.elements.status.value = book.status
+        this.formulario.elements.photo.value = book.photo
+        this.formulario.elements.comments.value = book.comments
+    }
+
+    setEditMode() {
+        this.formTitle.textContent = 'Editar libro'
+        this.bookIdContainer.classList.remove('hidden')
+    }
+
+    showPage(pageName) {
+        Object.values(this.pages).forEach(page => {
+            page.classList.add('hidden')
+        })
+
+        this.pages[pageName].classList.remove('hidden')
+    }
+
+    setAddMode(){
+        this.formTitle.textContent = 'Añadir libro'
+        this.bookIdContainer.classList.add('hidden')
     }
 }
