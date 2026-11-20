@@ -18,7 +18,7 @@ document.querySelector('#app').innerHTML = `
     <nav>
         <ul>
             <li><a href="#list">Ver Libros</a></li>
-            <li><a href="#form">Añadir Libro</a></li>
+            <li><a href="#form" id="addBookLink">Añadir Libro</a></li>
             <li><a href="#about">Acerca de...</a></li>
         </ul>
     </nav>
@@ -31,7 +31,7 @@ document.querySelector('#app').innerHTML = `
         <div id="form" class="hidden">
             <h2>Añadir libro</h2>
 
-            <form id="bookForm">
+            <form id="bookForm" novalidate>
                 <div id="book-id-container" class="hidden">
                     <label for="id">ID:</label>
                     <input type="text" id="id" name="id" readonly>
@@ -42,21 +42,28 @@ document.querySelector('#app').innerHTML = `
                     <select id="moduleCode" name="moduleCode" required>
                         <option value="">-- Selecciona un módulo --</option>
                     </select>
+                    <small id="moduleCode-error"></small>
                 </div>
 
                 <div>
                     <label for="publisher">publisher:</label>
                     <input id="publisher" name="publisher" required>
+                    <br>
+                    <small id="publisher-error"></small>
                 </div>
 
                 <div>
                     <label for="price">price:</label>
                     <input type="number" id="price" name="price" min="0" step="0.01" required>
+                    <br>
+                    <small id="price-error"></small>
                 </div>
 
                 <div>
                     <label for="pages">pages:</label>
-                    <input type="number" id="pages" name="pages" min="1" required>
+                    <input type="number" id="pages" name="pages" min="1" step="1" required>
+                    <br>
+                    <small id="pages-error"></small>
                 </div>
 
                 <div>
@@ -66,6 +73,8 @@ document.querySelector('#app').innerHTML = `
                     <input type="radio" id="used" name="status" value="used">used
                     <input type="radio" id="bad" name="status" value="bad">bad
                     <input type="radio" id="digital" name="status" value="digital">digital
+                    <br>
+                    <small id="status-error"></small>
                 </div>
 
                 <div>

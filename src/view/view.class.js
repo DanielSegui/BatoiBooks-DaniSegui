@@ -125,12 +125,18 @@ export default class View {
         this.moduleSelect.append(option)
     }
 
-    bindEvents(onSaveBook, onEditBook, onRemoveBook, onAddToCart) {
+    bindEvents(onSaveBook, onEditBook, onRemoveBook, onAddToCart, onCheckDuplicateBook) {
 
         this.formulario.addEventListener('submit', (event) => {
             event.preventDefault()
 
-            if (!this.formulario.reportValidity()) {
+            const publisherValido = this.validatePublisher()
+            const priceValido = this.validatePrice()
+            const pagesValido = this.validatePages()
+            const moduleCodeValido = this.validateModuleCode()
+            const statusValidado = this.validateStatus()
+
+            if (!publisherValido || !priceValido || !pagesValido || !moduleCodeValido || !statusValidado) {
                 return
             }
 
@@ -180,6 +186,69 @@ export default class View {
                 onAddToCart(id)
             }
         })
+
+        const publisher = document.getElementById('publisher')
+
+        publisher.addEventListener('input', () => {
+            this.validatePublisher()
+        })
+
+        const price = document.getElementById('price')
+
+        price.addEventListener('input', () => {
+            this.validatePrice()
+        })
+
+        const pages = document.getElementById('pages')
+
+        pages.addEventListener('input', () => {
+            this.validatePages()
+        })
+
+        const moduleCode = document.getElementById('moduleCode')
+
+        moduleCode.addEventListener('change', () => {
+            moduleCode.setCustomValidity('')
+
+            const moduloValido = this.validateModuleCode()
+
+            if (moduloValido) {
+                onCheckDuplicateBook(moduleCode.value)
+            }
+        })
+
+        const statusRadios = document.querySelectorAll('input[name="status"]')
+
+        statusRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                this.validateStatus()
+            })
+        })
+
+        const addBookLink = document.getElementById('addBookLink')
+
+        addBookLink.addEventListener('click', () => {
+            if (window.location.hash === '#form') {
+                this.clearValidationErrors()
+            }
+        })
+    }
+
+    showDuplicateBookError(existe){
+        const moduleCode = document.getElementById('moduleCode')
+        const moduleCodeError = document.getElementById('moduleCode-error')
+
+        if (existe) {
+            moduleCode.setCustomValidity('Ya tienes un libro de este módulo')
+            moduleCodeError.textContent = 'Ya tienes un libro de este módulo'
+        } else {
+            moduleCode.setCustomValidity('')
+            moduleCodeError.textContent = ''
+        }
+    }
+
+    getEditingBookId(){
+        return this.formulario.elements.id.value
     }
 
     removeBookCard(id) {
@@ -238,7 +307,21 @@ export default class View {
         this.formulario.elements.comments.value = book.comments
     }
 
+    clearValidationErrors(){
+        const errors = document.querySelectorAll(
+            '#moduleCode-error, #publisher-error, #price-error, #pages-error, #status-error'
+        )
+
+        errors.forEach(error => {
+            error.textContent = ''
+        })
+
+        const moduleCode = document.getElementById('moduleCode')
+        moduleCode.setCustomValidity('')
+    }
     setEditMode() {
+        this.clearValidationErrors()
+
         this.formTitle.textContent = 'Editar libro'
         this.bookIdContainer.classList.remove('hidden')
     }
@@ -252,7 +335,90 @@ export default class View {
     }
 
     setAddMode(){
+        this.clearValidationErrors()
+
         this.formTitle.textContent = 'Añadir libro'
         this.bookIdContainer.classList.add('hidden')
+    }
+
+    validatePublisher(){
+        const publisher = document.getElementById('publisher')
+        const publisherError = document.getElementById('publisher-error')
+
+        if(publisher.validity.valueMissing){
+            publisherError.textContent = "La editorial es obligatoria"
+            return false
+        } else {
+            publisherError.textContent = ''
+            return true
+        }
+    }
+
+    validatePrice(){
+        const price = document.getElementById('price')
+        const priceError = document.getElementById('price-error')
+
+        if(price.validity.valueMissing){
+            priceError.textContent = 'El precio es obligatorio'
+            return false
+        } else if(price.validity.rangeUnderflow) {
+            priceError.textContent = 'El precio no puede ser negativo'
+            return false
+        } else if(price.validity.stepMismatch) {
+            priceError.textContent = 'El precio debe tener como máximo dos decimales'
+            return false
+        }
+
+        priceError.textContent = ''
+        return true
+
+    }
+
+    validatePages(){
+        const pages = document.getElementById('pages')
+        const pagesError = document.getElementById('pages-error')
+
+        if(pages.validity.rangeUnderflow){
+            pagesError.textContent = 'El número de páginas no puede ser inferior a 1'
+            return false
+        } else if(pages.validity.valueMissing){
+            pagesError.textContent = 'Este campo es obligatorio'
+            return false
+        } else if(pages.validity.stepMismatch){
+            pagesError.textContent = 'El número de páginas tiene que ser entero'
+            return false
+        }
+
+        pagesError.textContent = ''
+        return true
+    }
+
+    validateModuleCode(){
+        const moduleCode = document.getElementById('moduleCode')
+        const moduleCodeError = document.getElementById('moduleCode-error')
+
+        if(moduleCode.validity.valueMissing){
+            moduleCodeError.textContent = 'Selecciona un módulo válido'
+            return false
+        } else if (moduleCode.validity.customError){
+            moduleCodeError.textContent = 'Ya tienes un libro de este módulo'
+            return false
+        }
+
+        moduleCodeError.textContent = ''
+        return true
+    }
+
+    validateStatus(){
+        const status = document.getElementById('new')
+        const statusError = document.getElementById('status-error')
+
+        if(status.validity.valueMissing){
+            statusError.textContent = 'Debes seleccionar un estado'
+            return false
+        }
+
+        statusError.textContent = ''
+        return true
     }
 }

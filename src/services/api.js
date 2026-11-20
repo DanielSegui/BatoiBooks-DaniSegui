@@ -108,6 +108,19 @@ async function changeDBUser(user){
     return data
 }
 
+async function getDBBookExists(userId, moduleCode) {
+    const response = await fetch(
+        SERVER + `/books?userId=${userId}&moduleCode=${moduleCode}`
+    )
+
+    if (!response.ok) {
+        throw `Error ${response.status} de la BBDD: ${response.statusText}`
+    }
+
+    const data = await response.json()
+    return data.length > 0
+}
+
 export {
     getDBBooks,
     getDBUsers,
@@ -117,5 +130,6 @@ export {
     removeDBBook,
     removeDBUser,
     changeDBBook,
-    changeDBUser
+    changeDBUser,
+    getDBBookExists
 }

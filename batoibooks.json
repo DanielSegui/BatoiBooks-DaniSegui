@@ -1867,7 +1867,7 @@
       "userId": 2,
       "moduleCode": "5025",
       "publisher": "Apunts",
-      "price": 12,
+      "price": 13,
       "pages": 25,
       "status": "good",
       "photo": "",
@@ -1925,7 +1925,7 @@
     {
       "id": 11,
       "userId": 2,
-      "moduleCode": "0045",
+      "moduleCode": "3042",
       "publisher": "marjal",
       "price": 124.5,
       "pages": 145,
@@ -1984,14 +1984,14 @@
     },
     {
       "id": 16,
+      "userId": 2,
+      "moduleCode": "3063",
       "publisher": "Apunts",
       "price": 30,
-      "moduleCode": "0015",
       "pages": 75,
       "status": "new",
       "photo": "",
       "comments": "",
-      "userId": 2,
       "soldDate": ""
     },
     {
@@ -2012,6 +2012,18 @@
       "price": 23.21,
       "moduleCode": "0343",
       "pages": 70,
+      "status": "new",
+      "photo": "",
+      "comments": "",
+      "userId": 2,
+      "soldDate": ""
+    },
+    {
+      "id": 19,
+      "publisher": "edebe",
+      "price": 11.98,
+      "moduleCode": "5021",
+      "pages": 123,
       "status": "new",
       "photo": "",
       "comments": "",

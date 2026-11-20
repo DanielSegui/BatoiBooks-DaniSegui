@@ -35,7 +35,8 @@ export default class Controller {
                 this.saveBook.bind(this),
                 this.startEditBook.bind(this),
                 this.removeBook.bind(this),
-                this.addToCart.bind(this)
+                this.addToCart.bind(this),
+                this.checkDuplicateBook.bind(this)
             )
 
             window.addEventListener('hashchange', () => {
@@ -119,7 +120,15 @@ export default class Controller {
     async saveBook(bookData) {
         try {
             if (bookData.id === '') {
+                const existe = await this.books.bookExists(USER_ID, bookData.moduleCode)
+
+                if(existe) {
+                    this.view.showDuplicateBookError(true)
+                    return
+                }
+
                 await this.addBook(bookData)
+
             } else {
                 await this.editBook(bookData)
             }
@@ -132,6 +141,16 @@ export default class Controller {
         try {
             const id = Number(bookData.id)
             const libroOriginal = this.books.getBookById(id)
+
+            if(String(libroOriginal.moduleCode) !== String(bookData.moduleCode)) {
+                const existe = await this.books.bookExists(USER_ID, bookData.moduleCode)
+                
+                if (existe) {
+                    this.view.showDuplicateBookError(true)
+                    return
+                }
+            
+            }
             const libroActualizado = {
                 ...libroOriginal,
                 ...bookData,
@@ -177,6 +196,36 @@ export default class Controller {
             behavior: 'smooth',
             block: 'start'
         })
+    }
+
+    async checkDuplicateBook(moduleCode){
+        try {
+
+            const id = this.view.getEditingBookId()
+
+            if(id !== ''){
+                const libroOriginal = this.books.getBookById(Number(id))
+
+                if(String(libroOriginal.moduleCode) === String(moduleCode)) {
+                    this.view.showDuplicateBookError(false)
+                    return
+                }
+            }
+
+            const existe = await this.books.bookExists(USER_ID, moduleCode)
+
+            this.view.showDuplicateBookError(existe)
+
+        } catch (error){
+            console.error('Error al comprobar el libro: ', error)
+
+            this.view.showDuplicateBookError(false)
+
+            this.view.showMessage(
+                'No se ha podido comprobar si ya tienes un libro de este módulo',
+                'danger'
+            )
+        }
     }
 
     handleNavigation(){

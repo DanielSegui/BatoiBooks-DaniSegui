@@ -1,4 +1,4 @@
-import { getDBBooks, addDBBook, removeDBBook, changeDBBook } from '../services/api.js'
+import { getDBBooks, addDBBook, removeDBBook, changeDBBook, getDBBookExists } from '../services/api.js'
 import Book from './book.class.js'
 const APUNTS = "Apunts"
 
@@ -95,8 +95,8 @@ export default class Books {
         return this.data.filter(book => book.publisher === APUNTS)
     }
 
-    bookExists(userId, moduleCode){
-        return this.data.some(book => book.userId === userId && book.moduleCode === moduleCode)
+    async bookExists(userId, moduleCode){
+        return await getDBBookExists(userId, moduleCode)
     }
 
     booksNotSold(){
